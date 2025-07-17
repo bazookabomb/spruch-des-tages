@@ -47,25 +47,46 @@ function renderSprueche() {
     sprueche.forEach((spruch, index) => {
         const li = document.createElement('li');
         
-        li.className = 'list-group-item';
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
         li.innerHTML = `
-            <p class="mb-1">"${spruch.text}"</p>
-            <small class="text-muted fst-italic">- ${spruch.autor}</small>
-            <button class="btn btn-warning" onclick="entferneSpruch(${index})">❌löschen</button>
+            <div>
+                <p class="mb-1">"${spruch.text}"</p>
+                <small class="text-muted fst-italic">- ${spruch.autor}</small>
+            </div>
+            <button class="btn btn-warning btn-sm" onclick="entferneSpruch(${index})">❌löschen</button>
         `;
         spruchListe.appendChild(li);
     });
 }
 
-function entferneSpruch(index){
-    sprueche.splice(index,1);
-    renderSprueche();
+async function entferneSpruch(index){
+    try {
+        // Sende den Aufruf an den DELETE-Endpunkt
+        await fetch(`API_URL + "sprueche/"${index}`, {
+            method: 'DELETE'
+        });
+        // Entferne den Spruch aus dem Array und aktualisiere die Anzeige    
+        sprueche.splice(index,1);
+        renderSprueche();
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 // Schritt 4: Auf das Absenden des Formulars reagieren.
 neuesSpruchForm.addEventListener('submit', function(event) {
     event.preventDefault();
     const neuerSpruch = { text: spruchInput.value, autor: autorInput.value };
+
+    // Sende den neuen Spruch an die API
+    fetch(API_URL + "sprueche", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(neuerSpruch)
+    })
+
     sprueche.push(neuerSpruch);
     renderSprueche();
     neuesSpruchForm.reset();
