@@ -44,7 +44,7 @@ async function holeSpruecheVonApi(){
 // Schritt 3: Eine Funktion, die deine Sprüche-Liste im HTML anzeigt.
 function renderSprueche() {
     spruchListe.innerHTML = '';
-    sprueche.forEach((spruch, index) => {
+    sprueche.forEach((spruch) => {
         const li = document.createElement('li');
         
         li.className = 'list-group-item d-flex justify-content-between align-items-center';
@@ -53,7 +53,7 @@ function renderSprueche() {
                 <p class="mb-1">"${spruch.text}"</p>
                 <small class="text-muted fst-italic">- ${spruch.autor}</small>
             </div>
-            <button class="btn btn-warning btn-sm" onclick="entferneSpruch(${index})">❌löschen</button>
+            <button class="btn btn-warning btn-sm" onclick="entferneSpruch(${spruch.id})">❌löschen</button>
         `;
         spruchListe.appendChild(li);
     });
@@ -61,12 +61,15 @@ function renderSprueche() {
 
 async function entferneSpruch(index){
     try {
+        console.log(`${API_URL}sprueche/${index}`);
         // Sende den Aufruf an den DELETE-Endpunkt
-        await fetch(`API_URL + "sprueche/"${index}`, {
+        await fetch(`${API_URL}sprueche/${index}`, {
             method: 'DELETE'
         });
         // Entferne den Spruch aus dem Array und aktualisiere die Anzeige    
-        sprueche.splice(index,1);
+        // sprueche.splice(index,1);
+        holeSpruecheVonApi();
+        // renderSprueche();
         renderSprueche();
     } catch (error) {
         console.log(error);
